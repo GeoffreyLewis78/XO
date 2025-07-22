@@ -9,7 +9,7 @@ struct ContentView: View {
     @State private var board: [[String]] = Array(repeating: Array(repeating: "", count: 3), count: 3)
     @State private var currentPlayer: String = "X" // Keeps track of whose turn it is
     @State private var winner: String? = nil
-
+    
     var body: some View {
         VStack(spacing: 10) {
             if let winner = winner {
@@ -20,25 +20,39 @@ struct ContentView: View {
                 Text("Current Turn: \(currentPlayer)")
                     .font(.headline)
             }
-
+            
             ForEach(0..<3, id: \.self) { row in
                 HStack(spacing: 10) {
                     ForEach(0..<3, id: \.self) { column in
                         Button(action: {
                             makeMove(row: row, column: column)
                         }) {
-                            Text(board[row][column])
-                                .frame(width: 80, height: 80)
-                                .background(Color.gray.opacity(0.2))
-                                .border(Color.black, width: 1)
-                                .font(.largeTitle)
-                                .foregroundColor(board[row][column] == "X" ? .blue : .red)
+                            if board[row][column] == "X" {
+                                Image("X")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width:80, height:80)
+                            }else if board[row][column] == "O" {
+                                Image("O")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width:80, height:80)
+                            } else {
+                                Rectangle()
+                                    .fill(Color.clear)
+                                    .frame(width: 80, height: 80)
+                            }
+                            
                         }
+                        .frame(width: 80, height: 80)
+                            .border(Color.black, width: 2)
+                        
                         .disabled(!board[row][column].isEmpty || winner != nil) // Prevents moves after win
                     }
                 }
+                
             }
-
+            
             Button("Restart Game") {
                 resetGame()
             }
@@ -49,7 +63,7 @@ struct ContentView: View {
         }
         .padding()
     }
-
+    
     /// Function to make a move on the board
     func makeMove(row: Int, column: Int) {
         if board[row][column].isEmpty && winner == nil {  // Prevent moves after game ends
@@ -81,10 +95,10 @@ struct ContentView: View {
             if winner == nil {
                 currentPlayer = "X"
             }
-                    
+            
         }
     }
-
+    
     /// Function to check if a player has won
     func checkForWinner() {
         // 1. Check Rows
@@ -94,7 +108,7 @@ struct ContentView: View {
                 return
             }
         }
-
+        
         // 2. Check Columns
         for col in 0..<3 {
             if board[0][col] != "" && board[0][col] == board[1][col] && board[1][col] == board[2][col] {
@@ -102,34 +116,35 @@ struct ContentView: View {
                 return
             }
         }
-
+        
         // 3. Check Diagonals
         if board[0][0] != "" && board[0][0] == board[1][1] && board[1][1] == board[2][2] {
             winner = board[0][0]
             return
         }
-
+        
         if board[0][2] != "" && board[0][2] == board[1][1] && board[1][1] == board[2][0] {
             winner = board[0][2]
             return
         }
-
+        
         // 4. Check for Draw
         if !board.joined().contains("") {
             winner = "Draw"
         }
     }
-
+    
     /// Function to reset the game
     func resetGame() {
         board = Array(repeating: Array(repeating: "", count: 3), count: 3)
         currentPlayer = "X"
         winner = nil
     }
-}
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
+    
+    
+    struct ContentView_Previews: PreviewProvider {
+        static var previews: some View {
+            ContentView()
+        }
     }
 }
